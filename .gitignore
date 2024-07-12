@@ -15,4 +15,5 @@ __pycache__/
 *.exe
 target/
 !.gitignore
-
+x64/
+*.user
