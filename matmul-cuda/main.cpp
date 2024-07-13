@@ -96,6 +96,21 @@ void get_large_matrix_size(int &m, int &n, int &k) {
     k = 1024;
 }
 
+void get_xl_matrix_size(int &m, int &n, int &k) {
+  // 2 billion parameter LLMs
+    m = 4096;
+    n = 8192;
+    k = 16384;
+}
+
+void get_xxl_matrix_size(int &m, int &n, int &k) {
+  // Uses about 1 GB of GPU memory, 256 million x 256 million matrix
+    m = 16384;
+    n = 16384;
+    k = 16384;
+}
+
+
 bool verify_result(const float *C1, const float *C2, int m, int n, int k) {
     for (int i = 0; i < m * k; ++i) {
         if (std::fabs(C1[i] - C2[i]) > TOLERANCE) {
@@ -153,13 +168,17 @@ void stub_matmul_GPU_float(const float *h_A, const float *h_B, float *h_C,
 void stub_matmul_GPU(vector<float> &A, vector<float> &B, vector<float> &C,
                      int m, int n, int k) {
     float *d_C;
-    gpuErrorCheck(cudaMallocManaged(&d_C, C.size() * sizeof(float)));
+    gpuErrorCheck(cudaMalloc(&d_C, C.size() * sizeof(float)));
 
     cuda_matmul_GPU(&A.at(0), &B.at(0), d_C, m, n, k);
     cudaDeviceSynchronize();
 
+    // copy from GPU to host
+    gpuErrorCheck(
+        cudaMemcpy(&C.at(0), d_C, C.size() * sizeof(float), cudaMemcpyDeviceToHost));
+
     assert(C.size() == m * k);
-    C.assign(d_C, d_C + C.size());
+    // C.assign(d_C, d_C + C.size());
     cudaFree(d_C);
 }
 
@@ -216,6 +235,10 @@ std::tuple<int, int, int> process_commands(const ArgsMap &args_map) {
         get_medium_matrix_size(m, n, k);
     } else if (matrix_size == "l") {
         get_large_matrix_size(m, n, k);
+    } else if (matrix_size == "xl") {
+        get_xl_matrix_size(m, n, k);
+    } else if (matrix_size == "xxl") {
+        get_xxl_matrix_size(m, n, k);
     } else {
         die("Invalid size argument. Use 's', 'm', 'l'.");
     }
