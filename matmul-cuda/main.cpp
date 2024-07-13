@@ -213,11 +213,33 @@ void do_matmul_GPU(vector<float>& A, vector<float>& B, vector<float>& C, int m,
 
   auto start_cpu = now();
 
+  /*
+   * This tests both Memory transfer (Matrix C) back & forth, which can
+   * slow down
   for (int i = 0; i < num_loops; i++) {
     std::cout << "." << std::flush;
     stub_matmul_GPU(A, B, C, m, n, k);
   }
+  */
+
+  // This tests WITHOUT memory transfer, just pure GPU matrix computation
+  float* d_C;
+  gpuErrorCheck(cudaMalloc(&d_C, C.size() * sizeof(float)));
+
+  for (int i = 0; i < num_loops; i++) {
+    std::cout << "." << std::flush;
+    cuda_matmul_GPU(&A.at(0), &B.at(0), d_C, m, n, k);
+    cudaDeviceSynchronize();
+  }
   auto end_cpu = now();
+
+  // copy from GPU to host
+  //gpuErrorCheck(cudaMemcpy(&C.at(0), d_C, C.size() * sizeof(float),
+  //                         cudaMemcpyDeviceToHost));
+  assert(C.size() == m * k);
+  // C.assign(d_C, d_C + C.size());
+  cudaFree(d_C);
+
   std::chrono::duration<double> duration = end_cpu - start_cpu;
 
   std::cout << std::endl;
