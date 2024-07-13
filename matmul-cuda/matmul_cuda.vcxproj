@@ -20,6 +20,9 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="matmul_gpu.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{52CA81A3-9DA9-4EC5-BC45-A6917CF3C95E}</ProjectGuid>
     <RootNamespace>matmul_cuda</RootNamespace>
