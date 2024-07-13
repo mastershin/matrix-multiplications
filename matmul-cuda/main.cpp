@@ -212,34 +212,35 @@ void do_matmul_GPU(vector<float>& A, vector<float>& B, vector<float>& C, int m,
   initialize_data(A, B, C, m, n, k);
 
   auto start_cpu = now();
-
-  /*
-   * This tests both Memory transfer (Matrix C) back & forth, which can
-   * slow down
+  
+  // This tests both Memory transfer (Matrix C) back & forth, which can
+  // slow down
   for (int i = 0; i < num_loops; i++) {
     std::cout << "." << std::flush;
     stub_matmul_GPU(A, B, C, m, n, k);
   }
-  */
+  
 
   // This tests WITHOUT memory transfer, just pure GPU matrix computation
-  float* d_C;
-  gpuErrorCheck(cudaMalloc(&d_C, C.size() * sizeof(float)));
-
+  // Just CUDA memory allocation only for result store
+  /*
   for (int i = 0; i < num_loops; i++) {
+    float* d_C;
+    gpuErrorCheck(cudaMalloc(&d_C, C.size() * sizeof(float)));
     std::cout << "." << std::flush;
     cuda_matmul_GPU(&A.at(0), &B.at(0), d_C, m, n, k);
     cudaDeviceSynchronize();
+    cudaFree(d_C);
   }
-  auto end_cpu = now();
 
   // copy from GPU to host
   //gpuErrorCheck(cudaMemcpy(&C.at(0), d_C, C.size() * sizeof(float),
   //                         cudaMemcpyDeviceToHost));
   assert(C.size() == m * k);
   // C.assign(d_C, d_C + C.size());
-  cudaFree(d_C);
+  */
 
+  auto end_cpu = now();
   std::chrono::duration<double> duration = end_cpu - start_cpu;
 
   std::cout << std::endl;
@@ -249,21 +250,32 @@ void do_matmul_GPU(vector<float>& A, vector<float>& B, vector<float>& C, int m,
 std::tuple<int, int, int> process_commands(const ArgsMap& args_map) {
   int m = 0, n = 0, k = 0;
 
-  string matrix_size = args_map.at("size");
-
-  if (matrix_size == "s") {
-    get_small_matrix_size(m, n, k);
-  } else if (matrix_size == "m") {
-    get_medium_matrix_size(m, n, k);
-  } else if (matrix_size == "l") {
-    get_large_matrix_size(m, n, k);
-  } else if (matrix_size == "xl") {
-    get_xl_matrix_size(m, n, k);
-  } else if (matrix_size == "xxl") {
-    get_xxl_matrix_size(m, n, k);
-  } else {
-    die("Invalid size argument. Use 's', 'm', 'l'.");
+  if (args_map.find("size") == args_map.end()) {
+	  std::cout << "m=" << args_map.at("m") << endl;
+	  std::cout << "n=" << args_map.at("n") << endl;
+	  std::cout << "k=" << args_map.at("k") << endl;
+    m = stoi(args_map.at("m"));
+    n = stoi(args_map.at("n"));
+    k = stoi(args_map.at("k"));
   }
+  else {
+    string matrix_size = args_map.at("size");
+
+    if (matrix_size == "s") {
+      get_small_matrix_size(m, n, k);
+    } else if (matrix_size == "m") {
+      get_medium_matrix_size(m, n, k);
+    } else if (matrix_size == "l") {
+      get_large_matrix_size(m, n, k);
+    } else if (matrix_size == "xl") {
+      get_xl_matrix_size(m, n, k);
+    } else if (matrix_size == "xxl") {
+      get_xxl_matrix_size(m, n, k);
+    } else {
+       die("Invalid size argument. Use 's', 'm', 'l', 'xl', 'xxl'.");
+    }
+  }
+
 
   num_loops = stoi(args_map.at("loop"));
   cout << "Number of loops: " << num_loops << endl;
