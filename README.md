@@ -9,3 +9,9 @@
 - ARM64 based
 - Apple
 - Uses Neon for similar to AVX operations
+
+## matmul-rust
+- Rust based
+
+## matmul-cuda
+- CUDA based

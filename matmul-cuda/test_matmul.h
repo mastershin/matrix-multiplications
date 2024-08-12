@@ -33,6 +33,10 @@ void test_matmul1(MatMulFuncPtr matmul_func) {
 
   // Assert that C matches C_expected
   for (int i = 0; i < m * k; ++i) {
+    if (C[i] != C_expected[i]) {
+      std::cerr << C[i] << " vs " << C_expected[i] << " at i=" << i
+                << std::endl;
+    }
     assert(C[i] == C_expected[i]);
   }
 
