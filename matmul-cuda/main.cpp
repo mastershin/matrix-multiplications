@@ -129,6 +129,10 @@ std::tuple<int, int, int> parse_command_args(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
 
   auto [m, n, k] = parse_command_args(argc, argv);
+  if (args_map.size() < 2)
+  {
+    die("Usage: ./main --size [s|m|l] --loop [num_loops]");
+  }
 
   std::cout << "Matrix Multiplication: A(" << m << "x" << k << ") * B(" << k
             << "x" << n << ") = C(" << m << "x" << n << ")" << std::endl;

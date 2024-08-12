@@ -97,6 +97,11 @@ fn process_commands(args_map: &ArgsMap) -> (usize, usize, usize, usize) {
 #[allow(non_snake_case)]
 fn main() {
     let args_map = parse_command_args();
+    if args_map.len() < 2 {
+        eprintln!("Usage: ./main --size [s|m|l] --loop [num_loops]");
+        std::process::exit(1);
+    }
+
     let (m, n, k, num_loops) = process_commands(&args_map);
 
     println!(
@@ -112,6 +117,7 @@ fn main() {
 
     let start_cpu = Instant::now();
 
+    println!("Starting the loop...");
     for _ in 0..num_loops {
         print!(".");
         std::io::stdout().flush().unwrap();

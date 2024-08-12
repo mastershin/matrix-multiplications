@@ -242,6 +242,10 @@ int main(int argc, char *argv[])
   }
 
   auto args_map = parse_command_args(argc, argv);
+  if (args_map.size() < 2)
+  {
+    die("Usage: ./main --size [s|m|l] --loop [num_loops]");
+  }
   auto [m, n, k] = process_commands(args_map);
 
   std::cout << "Matrix Multiplication: A(" << m << "x" << k << ") * B(" << k
