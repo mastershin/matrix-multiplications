@@ -133,6 +133,10 @@ std::tuple<int, int, int> process_commands(const ArgsMap &args_map)
 int main(int argc, char *argv[])
 {
   auto args_map = parse_command_args(argc, argv);
+  if (args_map.size() < 2)
+  {
+    die("Usage: ./main --size [s|m|l] --loop [num_loops]");
+  }
   auto [m, n, k] = process_commands(args_map);
 
   std::cout << "Matrix Multiplication: A(" << m << "x" << k << ") * B(" << k
@@ -147,6 +151,7 @@ int main(int argc, char *argv[])
   initialize_data(A, B, C, m, n, k);
 
   // CPU vector addition
+  cout << "Starting the loop..." << endl;
   auto start_cpu = now();
 
   for (int i = 0; i < num_loops; i++)
