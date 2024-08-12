@@ -6,8 +6,9 @@ A x B = C
 */
 
 #include "main.h"
-#include "matmul_cpu.h"
+#include "matmul_cpu_multicores.h"
 #include "test_matmul.h"
+#include <thread>
 
 #define TOLERANCE 1e-5 // Tolerance for floating-point comparison
 
@@ -142,9 +143,10 @@ int main(int argc, char *argv[])
   std::cout << "Matrix Multiplication: A(" << m << "x" << k << ") * B(" << k
             << "x" << n << ") = C(" << m << "x" << n << ")" << std::endl;
 
-  std::cout << "Running un-optimized CPU matmul (single core)..." << std::endl;
+  int num_threads = std::thread::hardware_concurrency();
+  std::cout << "Number of threads: " << num_threads << std::endl;
 
-  test_matmul(matmul_cpu);
+  test_matmul(matmul_cpu_multicores);
 
   // Allocate memory for matrices A, B, and C
   float *A, *B, *C;
@@ -159,7 +161,7 @@ int main(int argc, char *argv[])
   for (int i = 0; i < num_loops; i++)
   {
     std::cout << "." << std::flush;
-    matmul_cpu(A, B, C, m, n, k);
+    matmul_cpu_multicores(A, B, C, m, n, k);
   }
   auto end_cpu = now();
   std::chrono::duration<double> duration = end_cpu - start_cpu;

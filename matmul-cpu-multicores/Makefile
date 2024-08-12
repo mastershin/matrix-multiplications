@@ -20,8 +20,8 @@ else
 endif
 
 # Target and source files
-TARGET = matmul_cpu.ex
-SOURCES = main.cpp matmul_cpu.cpp
+TARGET = matmul_cpu_multicores.ex
+SOURCES = main.cpp matmul_cpu_multicores.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # Default target
