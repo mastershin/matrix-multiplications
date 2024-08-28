@@ -6,6 +6,7 @@
 #include <tuple>
 #include <map>
 #include <unordered_map>
+#include <string>   // for stoi
 
 using ArgsMap = std::unordered_map<std::string, std::string>;
 
